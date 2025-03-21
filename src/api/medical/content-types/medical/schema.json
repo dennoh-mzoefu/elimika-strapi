@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "medicals",
+  "info": {
+    "singularName": "medical",
+    "pluralName": "medicals",
+    "displayName": "medical",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "images": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

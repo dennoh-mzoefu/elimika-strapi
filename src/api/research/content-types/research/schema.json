@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "researchs",
+  "info": {
+    "singularName": "research",
+    "pluralName": "researchs",
+    "displayName": "Research",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "blocks"
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "relatedImages": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "summaryContent": {
+      "type": "text",
+      "required": true,
+      "maxLength": 200
+    }
+  }
+}
