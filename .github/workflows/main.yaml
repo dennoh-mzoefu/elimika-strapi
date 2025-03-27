@@ -20,6 +20,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: nixswinner/vidduka-web-app:latest
+          tags: nixswinner/elimika-strapi:latest
 
 
