@@ -1,7 +1,7 @@
 FROM node:20-alpine as base
 
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 
 COPY package*.json ./
@@ -12,41 +12,45 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-ARG CLERK_SECRET_KEY
-ENV CLERK_SECRET_KEY=$CLERK_SECRET_KEY
-
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NEXT_OUTPUT_STANDALONE true
+# Build Strapi in test mode
+ENV NODE_ENV=test
 RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV test
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 strapi
+RUN adduser --system --uid 1001 strapi
 
 # Copy necessary files from builder
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/build ./build
+COPY --from=builder /app/config ./config
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/database ./database
+COPY --from=builder /app/.env ./.env
 
-# Create cache directory with proper permissions and make it writable
-RUN mkdir -p .next/cache/images
-RUN chown -R nextjs:nodejs /app
-RUN chmod -R 755 /app/.next/cache
+# Create uploads directory with proper permissions
+RUN mkdir -p ./public/uploads
+RUN chown -R strapi:strapi /app
+RUN chmod -R 755 /app/public/uploads
 
-USER nextjs
-EXPOSE 3000
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+USER strapi
+EXPOSE 1337
+ENV PORT 1337
+ENV HOST "0.0.0.0"
 
-# Add environment variable to disable image optimization at runtime
-ENV NEXT_IMAGE_OPTIMIZATION false
+# PostgreSQL configuration for test environment
+ENV DATABASE_CLIENT postgres
+ENV DATABASE_HOST postgres
+ENV DATABASE_PORT 5432
+ENV DATABASE_NAME strapi_test
+ENV DATABASE_USERNAME strapi_test
+ENV DATABASE_PASSWORD strapi_test
+ENV DATABASE_SSL false
 
 # Start the app
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
