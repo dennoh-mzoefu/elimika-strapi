@@ -24,3 +24,4 @@ npm run strapi migrate
 # Start Strapi in development mode for test environment
 echo "Starting Strapi in development mode..."
 exec "$@"
+
